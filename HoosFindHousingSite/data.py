@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-CSV_PATH = Path(__file__).parent / "UVA_housing_clean.csv"
+CSV_PATH = Path(__file__).parent.parent / "UVA_housing_clean.csv"
 
 # Amenity column name → frontend-friendly label
 AMENITY_COLUMNS: dict[str, str] = {

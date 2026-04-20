@@ -7,7 +7,7 @@ class Basics(BaseModel):
     budget: int
     distance: float
     location: str
-    bedrooms: int
+    bedrooms: str
 
 class Amenities(BaseModel):
     laundry: bool
