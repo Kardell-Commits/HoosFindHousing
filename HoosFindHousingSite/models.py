@@ -1,0 +1,53 @@
+from pydantic import BaseModel
+from typing import Optional
+
+# Input Models
+
+class Basics(BaseModel):
+    budget: int
+    distance: float
+    location: str
+    bedrooms: str
+
+class Amenities(BaseModel):
+    laundry: bool
+    parking: bool
+    fitness: bool
+    pool: bool
+    ac: bool
+    furniture: bool
+
+class RoommateMatching(BaseModel):
+    enabled: bool
+    sleep_schedule: str
+    study_habits: str
+    cleanliness: str
+
+class UserPreferences(BaseModel):
+    basics: Basics
+    amenities: Amenities
+    roommates: RoommateMatching
+
+# Output Models
+
+class Score(BaseModel):
+    rent_score: float
+    distance_score: float
+    amenities_score: float
+    bedroom_score: float
+
+class Listing(BaseModel):
+    name: str
+    address: Optional[str]
+    link: str
+    price: str
+    price_avg: Optional[float]
+    distance: Optional[float]
+    bedrooms: Optional[float]
+    bathrooms: Optional[float]
+    sqft: Optional[float]
+    availability: Optional[str]
+    amenities: list[str]
+    overall_score: float
+    score_breakdown: Score
+    call_for_rent: bool
