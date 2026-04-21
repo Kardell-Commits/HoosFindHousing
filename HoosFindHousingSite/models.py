@@ -26,7 +26,7 @@ class RoommateMatching(BaseModel):
 class UserPreferences(BaseModel):
     basics: Basics
     amenities: Amenities
-    roommates: RoommateMatching
+    roommate_matching: RoommateMatching
 
 # Output Models
 

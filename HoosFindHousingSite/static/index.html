@@ -207,6 +207,7 @@
                 const data = await response.json();
 
                 // Pass the data received from Python to the UI
+                console.log("Backend response:", data);
                 renderResults(data.results);
                 
                 // Swap Views
@@ -215,28 +216,31 @@
 
             } catch (error) {
                 console.error("Error connecting to backend:", error);
+                alert("Something went wrong connecting to the server. Check the terminal for details.");
             }
         });
 
         function renderResults(results) {
             const container = document.getElementById('resultsList');
-            
-            container.innerHTML = results.map(item => `
+
+            container.innerHTML = results.map(item => {
+                const beds = item.bedrooms != null ? `${item.bedrooms} Bed` : 'N/A';
+                const dist = item.distance != null ? `${item.distance} mi to UVa` : 'Distance N/A';
+                const amenityScore = item.score_breakdown ? item.score_breakdown.amenities_score : 'N/A';
+                return `
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition">
                     <div class="mb-4 md:mb-0">
                         <div class="flex items-center gap-3 mb-1">
                             <h3 class="font-bold text-xl text-blue-900">${item.name}</h3>
-                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-semibold">${item.beds}</span>
+                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-semibold">${beds}</span>
                         </div>
-                        <p class="text-gray-600 font-medium">$${item.price}/mo • ${item.distance} miles to UVa</p>
-                        
+                        <p class="text-gray-600 font-medium">${item.price}/mo • ${dist}</p>
+
                         <div class="mt-3 flex flex-wrap gap-2">
-                            ${item.amenities_matched.map(am => `<span class="bg-green-50 border border-green-200 text-green-700 text-xs px-2 py-1 rounded-full">${am}</span>`).join('')}
+                            ${(item.amenities || []).map(am => `<span class="bg-green-50 border border-green-200 text-green-700 text-xs px-2 py-1 rounded-full">${am}</span>`).join('')}
                         </div>
-                        
-                        ${item.roommate !== "N/A" ? `<p class="text-sm text-blue-600 mt-3 font-medium">🤝 Potential Roommate: ${item.roommate}</p>` : ''}
                     </div>
-                    
+
                     <div class="flex flex-row md:flex-col gap-4 md:gap-1 text-center bg-gray-50 md:bg-transparent p-3 md:p-0 rounded w-full md:w-auto">
                         <div>
                             <div class="text-3xl font-black text-blue-600">${item.overall_score}%</div>
@@ -244,12 +248,12 @@
                         </div>
                         <div class="hidden md:block w-full h-[1px] bg-gray-200 my-1"></div>
                         <div>
-                            <div class="text-lg font-bold text-gray-700">${item.amenity_score}%</div>
+                            <div class="text-lg font-bold text-gray-700">${amenityScore}%</div>
                             <div class="text-[10px] text-gray-400 uppercase tracking-wider">Amenity Score</div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         function resetForm() {

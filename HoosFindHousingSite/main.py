@@ -22,6 +22,7 @@ async def search_housing(prefs: UserPreferences):
     try:
         results: list[Listing] = rank_listings(LISTINGS, prefs, top_n=20)
     except Exception as exc:
+        import traceback; traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(exc))
 
     return {
@@ -35,7 +36,7 @@ async def health():
     return {"status": "ok", "listings_loaded": len(LISTINGS)}
 
 # Mount the static directory
-#app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn

@@ -221,19 +221,38 @@ def rank_listings(
         else:
             price_display = listing.get("price", "N/A")
 
-        dist = listing.get("distance")
+        def nan_to_none(val):
+            try:
+                return None if (val is None or math.isnan(val)) else val
+            except TypeError:
+                return val
+
+        def str_or_none(val):
+            if val is None or (isinstance(val, float) and math.isnan(val)):
+                return None
+            return str(val)
+
+        def parse_sqft(val):
+            if val is None:
+                return None
+            try:
+                return float(str(val).replace(",", ""))
+            except (ValueError, TypeError):
+                return None
+
+        dist = nan_to_none(listing.get("distance"))
 
         results.append(Listing(
-            name=listing.get("title") or "Unknown Property",
-            address=listing.get("address"),
-            link=listing.get("link", ""),
+            name=str_or_none(listing.get("title")) or "Unknown Property",
+            address=str_or_none(listing.get("address")),
+            link=str_or_none(listing.get("link")) or "",
             price=price_display,
-            price_avg=price_avg if (price_avg and not math.isnan(price_avg)) else None,
-            distance=dist if (dist is not None and not math.isnan(dist)) else None,
-            bedrooms=listing.get("beds") if not (listing.get("beds") is None) else None,
-            bathrooms=listing.get("baths"),
-            sqft=str(listing.get("sqft", "")) or None,
-            availability=listing.get("availability"),
+            price_avg=nan_to_none(price_avg),
+            distance=dist,
+            bedrooms=nan_to_none(listing.get("beds")),
+            bathrooms=nan_to_none(listing.get("baths")),
+            sqft=parse_sqft(listing.get("sqft")),
+            availability=str_or_none(listing.get("availability")),
             amenities=matched_labels,
             overall_score=overall,
             score_breakdown=breakdown,
