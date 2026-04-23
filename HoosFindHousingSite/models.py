@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
 
 # Input Models
@@ -8,6 +8,11 @@ class Basics(BaseModel):
     distance: float
     location: str
     bedrooms: str
+
+    @field_validator('bedrooms', mode='before')
+    @classmethod
+    def coerce_bedrooms(cls, v):
+        return str(v)
 
 class Amenities(BaseModel):
     laundry: bool
