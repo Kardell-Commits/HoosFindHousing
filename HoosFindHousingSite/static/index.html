@@ -220,7 +220,7 @@
             }
         });
 
-        function renderResults(results) {
+function renderResults(results) {
             const container = document.getElementById('resultsList');
 
             container.innerHTML = results.map(item => {
@@ -228,20 +228,22 @@
                 const dist = item.distance != null ? `${item.distance} mi to UVa` : 'Distance N/A';
                 const amenityScore = item.score_breakdown ? item.score_breakdown.amenities_score : 'N/A';
                 return `
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition">
-                    <div class="mb-4 md:mb-0">
-                        <div class="flex items-center gap-3 mb-1">
-                            <h3 class="font-bold text-xl text-blue-900">${item.name}</h3>
-                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-semibold">${beds}</span>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition gap-6">
+                    
+                    <div class="mb-4 md:mb-0 flex-1 min-w-0 w-full">
+                        
+                        <div class="flex flex-wrap items-center gap-3 mb-1">
+                            <h3 class="font-bold text-xl text-blue-900 break-words">${item.name}</h3>
+                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-semibold whitespace-nowrap shrink-0">${beds}</span>
                         </div>
                         <p class="text-gray-600 font-medium">${item.price}/mo • ${dist}</p>
 
                         <div class="mt-3 flex flex-wrap gap-2">
-                            ${(item.amenities || []).map(am => `<span class="bg-green-50 border border-green-200 text-green-700 text-xs px-2 py-1 rounded-full">${am}</span>`).join('')}
+                            ${(item.amenities || []).map(am => `<span class="bg-green-50 border border-green-200 text-green-700 text-xs px-2 py-1 rounded-full whitespace-nowrap">${am}</span>`).join('')}
                         </div>
                     </div>
 
-                    <div class="flex flex-row md:flex-col gap-4 md:gap-1 text-center bg-gray-50 md:bg-transparent p-3 md:p-0 rounded w-full md:w-auto">
+                    <div class="flex flex-row md:flex-col gap-4 md:gap-1 text-center bg-gray-50 md:bg-transparent p-3 md:p-0 rounded w-full md:w-auto shrink-0">
                         <div>
                             <div class="text-3xl font-black text-blue-600">${item.overall_score}%</div>
                             <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total Match</div>

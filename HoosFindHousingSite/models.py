@@ -22,7 +22,7 @@ class RoommateMatching(BaseModel):
     sleep_schedule: str
     study_habits: str
     cleanliness: str
-
+  
 class UserPreferences(BaseModel):
     basics: Basics
     amenities: Amenities
