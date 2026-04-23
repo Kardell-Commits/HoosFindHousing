@@ -51,3 +51,7 @@ class Listing(BaseModel):
     overall_score: float
     score_breakdown: Score
     call_for_rent: bool
+
+class RefineRequest(BaseModel):
+    prompt: str
+    current_prefs: UserPreferences
