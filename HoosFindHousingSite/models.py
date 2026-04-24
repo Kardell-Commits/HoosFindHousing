@@ -8,6 +8,7 @@ class Basics(BaseModel):
     distance: float
     location: str
     bedrooms: str
+    priority_ranking: list[str] = ["rent", "distance", "amenities", "bedrooms"]
 
     @field_validator('bedrooms', mode='before')
     @classmethod
