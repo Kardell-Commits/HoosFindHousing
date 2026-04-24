@@ -5,7 +5,7 @@ from typing import Optional
 
 class Basics(BaseModel):
     budget: int
-    distance: float
+    walk_time: float
     location: str = "any"
     bedrooms: str
     priority_ranking: list[str] = ["rent", "distance", "amenities", "bedrooms"]
@@ -48,7 +48,8 @@ class Listing(BaseModel):
     link: str
     price: str
     price_avg: Optional[float]
-    distance: Optional[float]
+    walk_minutes: Optional[float]
+    drive_minutes: Optional[float]
     bedrooms: Optional[float]
     bathrooms: Optional[float]
     sqft: Optional[float]

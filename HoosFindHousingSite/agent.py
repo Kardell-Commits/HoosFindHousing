@@ -63,25 +63,28 @@ def score_rent(listing: dict, prefs: UserPreferences) -> float:
     else:
         return 0.0
 
-# Scores how close the listing is to grounds
-def score_distance(listing: dict, prefs: UserPreferences) -> float:
+# Scores how close the listing is to grounds based on walking time (minutes)
+def score_walk_time(listing: dict, prefs: UserPreferences) -> float:
 
-    # Small penalty for not having data related to distance
-    dist = listing.get("distance")
-    if dist is None or math.isnan(dist):
-        return 40.0
+    walk_min = listing.get("walk_minutes")
 
-    # Default value of 10 is max distance is not provided
-    max_dist = prefs.basics.distance
-    if max_dist <= 0:
-        max_dist = 10.0
+    # Fall back to miles-based estimate if ORS data hasn't been computed yet
+    if walk_min is None or (isinstance(walk_min, float) and math.isnan(walk_min)):
+        dist_miles = listing.get("distance")
+        if dist_miles is None or (isinstance(dist_miles, float) and math.isnan(dist_miles)):
+            return 40.0
+        walk_min = dist_miles * 20.0  # rough fallback: ~20 min/mile
 
-    # Disqualified if greater than max distance
-    if dist > max_dist:
+    max_walk = prefs.basics.walk_time
+    if max_walk <= 0:
+        max_walk = 30.0
+
+    # Disqualified if walking time exceeds the user's max
+    if walk_min > max_walk:
         return 0.0
 
-    # Perfect score for distance of 0, score gets smaller as listing gets farther away
-    score = 100.0 * (1.0 - dist / max_dist) ** 1.5
+    # Perfect score at 0 min, decreasing as walk time grows
+    score = 100.0 * (1.0 - walk_min / max_walk) ** 1.5
     return max(0.0, min(100.0, score))
 
 # Creates the score based on how many amenities the listing has, but only if the amenity is something the student wants
@@ -183,7 +186,7 @@ def score_bedrooms(listing: dict, prefs: UserPreferences) -> float:
 def score_listing(listing: dict, prefs: UserPreferences) -> tuple[float, Score, list[str]]:
 
     rent_score = score_rent(listing, prefs)
-    distance_score = score_distance(listing, prefs)
+    distance_score = score_walk_time(listing, prefs)
     amenity_score, matched_labels = score_amenities(listing, prefs)
     bedroom_score = score_bedrooms(listing, prefs)
 
@@ -251,7 +254,13 @@ def rank_listings(
             except (ValueError, TypeError):
                 return None
 
-        dist = nan_to_none(listing.get("distance"))
+        walk_min = nan_to_none(listing.get("walk_minutes"))
+        drive_min = nan_to_none(listing.get("drive_minutes"))
+
+        # Fall back to miles-based estimate if ORS data hasn't been computed yet
+        if walk_min is None:
+            dist_miles = nan_to_none(listing.get("distance"))
+            walk_min = round(dist_miles * 20) if dist_miles is not None else None
 
         results.append(Listing(
             name=str_or_none(listing.get("title")) or "Unknown Property",
@@ -259,7 +268,8 @@ def rank_listings(
             link=str_or_none(listing.get("link")) or "",
             price=price_display,
             price_avg=nan_to_none(price_avg),
-            distance=dist,
+            walk_minutes=walk_min,
+            drive_minutes=drive_min,
             bedrooms=nan_to_none(listing.get("beds")),
             bathrooms=nan_to_none(listing.get("baths")),
             sqft=parse_sqft(listing.get("sqft")),
