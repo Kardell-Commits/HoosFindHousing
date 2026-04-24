@@ -210,7 +210,6 @@
                 basics: {
                     budget: parseInt(document.getElementById('budget').value),
                     distance: parseFloat(document.getElementById('distance').value),
-                    location: document.getElementById('location').value,
                     bedrooms: document.getElementById('bedrooms').value,
                     priority_ranking: rankOrder.map(o => o.key)
                 },
@@ -245,6 +244,7 @@
 
                 // Pass the data received from Python to the UI
                 console.log("Backend response:", data);
+                console.log("First result object:", JSON.stringify(data.results[0], null, 2));
                 renderResults(data.results);
                 
                 // Swap Views
