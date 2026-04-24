@@ -1,13 +1,22 @@
 import math
 from models import UserPreferences, Listing, Score
 
-# These weights can be changed, but they must add up to 1.0
-WEIGHTS = {
-    "rent":     0.35,
-    "distance": 0.30,
-    "amenity":  0.25,
-    "bedroom":  0.10,
+# Ranked weights that add up to 1.0, which one they apply to depends on the student's preference
+RANK_WEIGHTS = [0.45, 0.28, 0.17, 0.1]
+
+PRIORITY_KEY_MAP = {
+    "rent": "rent",
+    "distance": "distance",
+    "amenities": "amenity",
+    "bedrooms": "bedroom"
 }
+# Function to create weights based on preference
+def build_weights(ranking: list[str]) -> dict[str, float]:
+    weights = {}
+    for i, key in enumerate(ranking):
+        scorer_key = PRIORITY_KEY_MAP.get(key, key)
+        weights[scorer_key] = RANK_WEIGHTS[i]
+    return weights
 
 # Each entry: (UserPreferences attribute path, csv column, friendly label)
 AMENITY_PREF_MAP: list[tuple[str, str, str]] = [
@@ -178,11 +187,13 @@ def score_listing(listing: dict, prefs: UserPreferences) -> tuple[float, Score, 
     amenity_score, matched_labels = score_amenities(listing, prefs)
     bedroom_score = score_bedrooms(listing, prefs)
 
+    weights = build_weights(prefs.basics.priority_ranking)
+
     overall = (
-            WEIGHTS["rent"] * rent_score +
-            WEIGHTS["distance"] * distance_score +
-            WEIGHTS["amenity"] * amenity_score +
-            WEIGHTS["bedroom"] * bedroom_score
+            weights["rent"] * rent_score +
+            weights["distance"] * distance_score +
+            weights["amenity"] * amenity_score +
+            weights["bedroom"] * bedroom_score
     )
     overall = round(min(100.0, max(0.0, overall)), 1)
 

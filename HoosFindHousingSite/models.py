@@ -6,8 +6,9 @@ from typing import Optional
 class Basics(BaseModel):
     budget: int
     distance: float
-    location: str
+    location: str = "any"
     bedrooms: str
+    priority_ranking: list[str] = ["rent", "distance", "amenities", "bedrooms"]
 
     @field_validator('bedrooms', mode='before')
     @classmethod
