@@ -29,15 +29,11 @@
                             <label class="block text-sm font-medium mb-1">Max Distance to Grounds (miles)</label>
                             <input type="number" step="0.1" id="distance" value="1.5" class="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-blue-500" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Preferred Location</label>
-                            <select id="location" class="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-blue-500">
-                                <option value="any">Anywhere</option>
-                                <option value="corner">The Corner</option>
-                                <option value="jpa">JPA</option>
-                                <option value="preston">Preston Ave / 10th & Dairy</option>
-                                <option value="stonefield">Stonefield / 29 North</option>
-                            </select>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-1">Priority Ranking</label>
+                            <p class="text-xs text-gray-400 mb-2">Drag to reorder — #1 carries the most weight in scoring</p>
+                            <div id="rankList" class="flex flex-col gap-2"></div>
+                            <p class="text-xs text-gray-400 mt-2">Weights: 1st = 45% · 2nd = 28% · 3rd = 17% · 4th = 10%</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-1">Bedrooms Needed</label>
@@ -167,6 +163,43 @@
                 fields.classList.add('opacity-50', 'pointer-events-none');
             }
         }
+        // Handles ranking the weights
+        const RANK_ITEMS = [
+            { key: "rent",      label: "Rent / Budget" },
+            { key: "distance",  label: "Distance" },
+            { key: "amenities", label: "Amenities" },
+            { key: "bedrooms",  label: "Bedrooms" },
+        ];
+        const RANK_WEIGHTS_DISPLAY = ["45%", "28%", "17%", "10%"];
+        let rankOrder = [...RANK_ITEMS];
+        let dragSrcIdx = null;
+
+        function renderRankList() {
+            const list = document.getElementById("rankList");
+            list.innerHTML = "";
+            rankOrder.forEach((item, i) => {
+                const el = document.createElement("div");
+                el.draggable = true;
+                el.className = "flex items-center gap-3 bg-white border border-gray-200 rounded-lg px-3 py-2 cursor-grab";
+                el.innerHTML = `
+                    <span class="text-gray-300 select-none">&#9776;</span>
+                    <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold flex items-center justify-center shrink-0">${i+1}</span>
+                    <span class="flex-1 text-sm font-medium">${item.label}</span>
+                    <span class="text-xs text-gray-400">${RANK_WEIGHTS_DISPLAY[i]}</span>
+                `;
+                el.addEventListener("dragstart", () => { dragSrcIdx = i; });
+                el.addEventListener("dragover",  e => e.preventDefault());
+                el.addEventListener("drop", () => {
+                    if (dragSrcIdx === null || dragSrcIdx === i) return;
+                    const moved = rankOrder.splice(dragSrcIdx, 1)[0];
+                    rankOrder.splice(i, 0, moved);
+                    dragSrcIdx = null;
+                    renderRankList();
+                });
+                list.appendChild(el);
+            });
+        }
+        renderRankList();
 
         // Handle Form Submission
         document.getElementById('preferencesForm').addEventListener('submit', async (e) => {
@@ -178,7 +211,8 @@
                     budget: parseInt(document.getElementById('budget').value),
                     distance: parseFloat(document.getElementById('distance').value),
                     location: document.getElementById('location').value,
-                    bedrooms: document.getElementById('bedrooms').value
+                    bedrooms: document.getElementById('bedrooms').value,
+                    priority_ranking: rankOrder.map(o => o.key)
                 },
                 amenities: {
                     laundry: document.getElementById('am_laundry').checked,
