@@ -300,7 +300,10 @@
                     <div class="mb-4 md:mb-0 flex-1 min-w-0 w-full">
                         
                         <div class="flex flex-wrap items-center gap-3 mb-1">
-                            <h3 class="font-bold text-xl text-blue-900 break-words">${item.name}</h3>
+                            <a href="${item.link}" target="_blank" rel="noopener noreferrer"
+                                class="font-bold text-xl text-blue-900 break-words hover:underline">
+                                ${item.name}
+                            </a>
                             <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-semibold whitespace-nowrap shrink-0">${beds}</span>
                         </div>
                         <p class="text-gray-600 font-medium">${item.price}/mo • ${walkStr}${driveStr}</p>
