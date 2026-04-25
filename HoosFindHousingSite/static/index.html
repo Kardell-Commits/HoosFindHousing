@@ -274,12 +274,17 @@
                 });
                 
                 const data = await response.json();
-                currentPreferences = data.updated_prefs; // Save AI's new settings
-                renderResults(data.results); // Re-render the UI
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "Refinement request failed");
+                }
+                console.log("Response:",data)
+                currentPreferences=data.updated_prefs;
+                renderResults(data.results);
                 document.getElementById('refinePrompt').value = ""; // Clear box
-            } catch (error) {
-                console.error(error);
-                alert("Refinement failed. Ensure Ollama is running.");
+        } catch (error) {
+                 console.error("Refine error:", error);
+                alert("Refinement failed: " + error.message);
             } finally {
                 refineBtn.innerText = "Refine";
                 refineBtn.disabled = false;
