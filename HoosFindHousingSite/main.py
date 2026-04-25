@@ -11,7 +11,6 @@ from agent import rank_listings
 from dotenv import load_dotenv
 load_dotenv()
 
-client= OpenAI(api_key=os.getenv("OPENAI_KEY"))
 app = FastAPI(title="Hoos Find Housing", version="1.0.0")
 
 app.add_middleware(
@@ -41,10 +40,13 @@ async def search_housing(prefs: UserPreferences):
 @app.post("/api/refine", response_model=dict)
 async def refine_housing(request: RefineRequest):
     try:
-        if not os.getenv("OPENAI_KEY"):
+        openai_key=os.getenv("OPENAI_KEY")
+        if not openai_key:
             raise HTTPException(
                 status_code=500, detail="OPENAI KEY IS MISSING."
             )
+
+        client=OpenAI(api_key=openai_key)
         system_instructions=f"""
 You are a housing search configuration assistant for UVA students.
 
